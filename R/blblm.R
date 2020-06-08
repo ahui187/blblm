@@ -24,6 +24,11 @@ blblm <- function(formula, data, m = 10, B = 5000) {
 
 
 #' split data into m parts of approximated equal sizes
+#'
+#' Dataset is separated into m subsamples
+#'
+#' @param data dataset
+#' @param m number of data splits
 split_data <- function(data, m) {
   idx <- sample.int(m, nrow(data), replace = TRUE)
   data %>% split(idx)
@@ -31,19 +36,40 @@ split_data <- function(data, m) {
 
 
 #' compute the estimates
+#'
+#' Subsamples are resampled to size of original data B times, and linear regression is applied
+#' to each of them
+#'
+#' @param formula for linear regression
+#' @param data dataset
+#' @param n size of original dataset
+#' @param B bootstrap sample size
 lm_each_subsample <- function(formula, data, n, B) {
   replicate(B, lm_each_boot(formula, data, n), simplify = FALSE)
 }
 
 
 #' compute the regression estimates for a blb dataset
+#'
+#' Freqency of data row repetitions are generated using multinomial distribution, which is then used
+#' in linear regression
+#'
+#' @param formula for linear regression
+#' @param data dataset
+#' @param n size of original dataset
 lm_each_boot <- function(formula, data, n) {
   freqs <- rmultinom(1, n, rep(1, nrow(data)))
   lm1(formula, data, freqs)
 }
 
 
-#' estimate the regression estimates based on given the number of repetitions
+#' estimate the regression estimates based on the given number of repetitions
+#'
+#' Linear regression is made based on the formula given and a list of regression estimates are returned
+#'
+#' @param formula for linear regression
+#' @param data dataset
+#' @param freqs row repetitions
 lm1 <- function(formula, data, freqs) {
   # drop the original closure of formula,
   # otherwise the formula will pick a wront variable from the global scope.
@@ -54,12 +80,20 @@ lm1 <- function(formula, data, freqs) {
 
 
 #' compute the coefficients from fit
+#'
+#' Coefficients from linear regression is returned
+#'
+#' @param fit linear regression
 blbcoef <- function(fit) {
   coef(fit)
 }
 
 
 #' compute sigma from fit
+#'
+#' Residual standard deviation from linear regression is returned
+#'
+#' @param fit linear regression
 blbsigma <- function(fit) {
   p <- fit$rank
   y <- model.extract(fit$model, "response")
@@ -77,6 +111,17 @@ print.blblm <- function(x, ...) {
 }
 
 
+#' Residual standard deviation from blblm
+#'
+#' The residual standard deviation from blblm function is returned. Confidence intervals can also
+#' be specified
+#'
+#' @param object blblm result
+#'
+#' @param confidence bool for confidence interval
+#' @param level confidence level in decimal
+#' @param ... other parameters
+#'
 #' @export
 #' @method sigma blblm
 sigma.blblm <- function(object, confidence = FALSE, level = 0.95, ...) {
@@ -93,6 +138,14 @@ sigma.blblm <- function(object, confidence = FALSE, level = 0.95, ...) {
   }
 }
 
+#' Regression coefficients from blblm
+#'
+#' Linear regression coefficients from blblm function is returned.
+#'
+#' @param object blblm result
+#'
+#' @param ... other parameters
+#'
 #' @export
 #' @method coef blblm
 coef.blblm <- function(object, ...) {
@@ -101,6 +154,16 @@ coef.blblm <- function(object, ...) {
 }
 
 
+#' Confidence interval from blblm
+#'
+#' Confidence interval from blblm function are returned for specified column names from dataset
+#'
+#' @param object blblm result
+#'
+#' @param parm parameters for confidence interval
+#' @param level confidence level in decimal
+#' @param ... other parameters
+#'
 #' @export
 #' @method confint blblm
 confint.blblm <- function(object, parm = NULL, level = 0.95, ...) {
@@ -119,6 +182,18 @@ confint.blblm <- function(object, parm = NULL, level = 0.95, ...) {
   out
 }
 
+#' Prediction from blblm
+#'
+#' Linear regression prediction from blblm function given predictor values. Confidence interval for
+#' prediction can be specified.
+#'
+#' @param object blblm result
+#'
+#' @param new_data data frame of predictor values
+#' @param confidence bool confidence interval
+#' @param level confidence level in decimal
+#' @param ... other parameters
+#'
 #' @export
 #' @method predict blblm
 predict.blblm <- function(object, new_data, confidence = FALSE, level = 0.95, ...) {

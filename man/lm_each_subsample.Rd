@@ -6,6 +6,16 @@
 \usage{
 lm_each_subsample(formula, data, n, B)
 }
+\arguments{
+\item{formula}{for linear regression}
+
+\item{data}{dataset}
+
+\item{n}{size of original dataset}
+
+\item{B}{bootstrap sample size}
+}
 \description{
-compute the estimates
+Subsamples are resampled to size of original data B times, and linear regression is applied
+to each of them
 }

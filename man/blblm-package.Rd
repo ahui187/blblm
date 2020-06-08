@@ -4,10 +4,13 @@
 \name{blblm-package}
 \alias{blblm}
 \alias{blblm-package}
-\title{blblm: What the Package Does (Title Case)}
+\title{blblm: Bag of Little Bootstraps}
 \description{
-More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+The data is first separated into m subsamples. Then for each subsample,
+    we resample until we have the size of the original data r times, find the bootstap
+    statistic(linear regression in this case), and compute the desired statistic(linear regression
+    coefficients and residual standard deviation) from the bootstrap statistics. Then the average of 
+    the m statistics are averaged.
 }
 \details{
 Linear Regression with Little Bag of Bootstraps

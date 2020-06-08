@@ -6,6 +6,14 @@
 \usage{
 lm_each_boot(formula, data, n)
 }
+\arguments{
+\item{formula}{for linear regression}
+
+\item{data}{dataset}
+
+\item{n}{size of original dataset}
+}
 \description{
-compute the regression estimates for a blb dataset
+Freqency of data row repetitions are generated using multinomial distribution, which is then used
+in linear regression
 }

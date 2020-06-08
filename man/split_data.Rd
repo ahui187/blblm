@@ -6,6 +6,11 @@
 \usage{
 split_data(data, m)
 }
+\arguments{
+\item{data}{dataset}
+
+\item{m}{number of data splits}
+}
 \description{
-split data into m parts of approximated equal sizes
+Dataset is separated into m subsamples
 }

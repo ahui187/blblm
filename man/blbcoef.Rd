@@ -6,6 +6,9 @@
 \usage{
 blbcoef(fit)
 }
+\arguments{
+\item{fit}{linear regression}
+}
 \description{
-compute the coefficients from fit
+Coefficients from linear regression is returned
 }

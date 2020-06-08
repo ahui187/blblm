@@ -6,6 +6,9 @@
 \usage{
 blbsigma(fit)
 }
+\arguments{
+\item{fit}{linear regression}
+}
 \description{
-compute sigma from fit
+Residual standard deviation from linear regression is returned
 }
