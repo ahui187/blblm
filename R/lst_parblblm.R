@@ -18,7 +18,7 @@
 lst_parblblm <- function(formula, data, B = 5000, file_names, work = 4) {
   suppressWarnings(future::plan(future::multiprocess, workers = work))
   lt = file_names %>% furrr::future_map(~{
-    df <- readr::read_csv(., col_types = cols())
+    df <- readr::read_csv(., col_types = readr::cols())
   })
   estimates <- furrr::future_map(
     lt,

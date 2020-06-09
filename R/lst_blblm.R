@@ -14,7 +14,7 @@
 
 lst_blblm <- function(formula, data, B = 5000, file_names) {
   lt = file_names %>% map(~{
-    df <- readr::read_csv(., col_types = cols())
+    df <- readr::read_csv(., col_types = readr::cols())
   })
   estimates <- map(
     lt,
