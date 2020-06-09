@@ -1,0 +1,113 @@
+---
+title: "Blblm Documentation"
+author: "Alvin Hui"
+date: "6/8/2020"
+output: html_document
+---
+
+```{r}
+library(blblm)
+```
+
+The original base version on the blblm package uses bag of little bootstraps for linear regression. In bag of little bootstraps, data of size n is split into m subsamples of size a. Next, for each of the subsamples: resample b times until sample size is size n, the original size of the data, compute bootstrap statistic, which is regression coefficients and residual standard deviation in this case, and compute statistic from the b bootstrap statistics. Finally, average the statistics from each subsample to form one statistic.
+The parameters of the blblm function are the linear regression formula, the dataset to be used, the number of subsamples the data will be split into, and the number of bootstrap samples. After using the blblm function, regular functions such as coef to find the regression coefficients and sigma to find the residual standard deviation can be used. Examples using the mtcars dataset will be shown for all following functions.
+
+```{r}
+fit <- blblm(mpg ~ wt * hp, data = mtcars, m = 3, B = 100)
+
+#coefficients
+coef(fit)
+#confidence interval
+confint(fit, c("wt", "hp"))
+#residual standard error
+sigma(fit)
+#residual standard error with confidence interval
+sigma(fit, confidence = TRUE)
+#prediction
+predict(fit, data.frame(wt = c(2.5, 3), hp = c(150, 170)))
+#prediction with confidence interval
+predict(fit, data.frame(wt = c(2.5, 3), hp = c(150, 170)), confidence = TRUE)
+```
+
+# Parallelization
+One of the additions I tried to implement was adding parallelization to the blblm function, which I did in the parblblm function. To implement parallelization, I used the furrr package to add workers to the blblm function and changed map to future_map. There is one more parameter as compared to the blblm function for the user to specify the amount of workers used. Otherwise, my parblblm function works the same as the blblm function.
+
+```{r}
+fit2 <- parblblm(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, work = 2)
+
+#coefficients
+coef(fit2)
+#confidence interval
+confint(fit2, c("wt", "hp"))
+#residual standard error
+sigma(fit2)
+#residual standard error with confidence interval
+sigma(fit2, confidence = TRUE)
+#prediction
+predict(fit2, data.frame(wt = c(2.5, 3), hp = c(150, 170)))
+#prediction with confidence interval
+predict(fit2, data.frame(wt = c(2.5, 3), hp = c(150, 170)), confidence = TRUE)
+```
+
+I also made a function that asks the user whether they want to run blblm with parallelization or not. The parameters used is the same as with the parblblm function. If the user wants to use parallelization, they will type "yes", and then the parblblm function will run. If the user types "no", the regular blblm function will run. "yes" and "no" are not case-sensitive, so the user can type with upper-case or lower-case letters. If "yes" or "no" is not typed in, an error message will appear.
+
+```{r}
+#fit3 <- choice_blblm(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, work = 2)
+#> Would you like to use parallel processing? Type yes or no: yes
+```
+
+```{r}
+#fit4 <- choice_blblm(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, work = 2)
+#> Would you like to use parallel processing? Type yes or no: no
+```
+
+```{r}
+#fit5 <- choice_blblm(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, work = 2)
+#> Would you like to use parallel processing? Type yes or no: maybe
+#> [1] "Input is not recognized"
+```
+Functions to see the regression coefficients and confidence intervals can then be carried out as in the examples for parblblm and blblm, respectively.
+  
+# Reading data from list of file names
+Another addition I tried to implement was allowing the user to specify a precreated list of file names containing the data already split up, so the dataset doesn't have to be loaded in the blblm function. This function, called lst_blblm, uses the blblm function as its base and only changes the way data is read. The parameters for lst_blblm is the linear regression formula, the dataset used, the number of bootstrap samples, and the list of file names the data is split in. For the example below, I separated the mtcars dataset into three csv files and load them in to be used.
+
+```{r}
+file_names <- Sys.glob("C:/Users/angel/Documents/blblm/mtcars/*")
+test <- lst_blblm(mpg ~ wt * hp, data = mtcars, B = 100, file_names = file_names)
+
+#coefficients
+coef(test)
+#confidence interval
+confint(test, c("wt", "hp"))
+#residual standard error
+sigma(test)
+#residual standard error with confidence interval
+sigma(test, confidence = TRUE)
+#prediction
+predict(test, data.frame(wt = c(2.5, 3), hp = c(150, 170)))
+#prediction with confidence interval
+predict(test, data.frame(wt = c(2.5, 3), hp = c(150, 170)), confidence = TRUE)
+```
+
+I also implemented a version of lst_blblm that uses parallelization, called lst_parblblm. The lst_parblblm function is based off of the parblblm function. Its parameters are the linear regression formula, the original dataset, the bootstrap sample number, the list of file names the data is split into, and the number of workers wanted for parallelization.
+
+```{r}
+test2 = lst_parblblm(mpg ~ wt * hp, data = mtcars, B = 100, file_names = file_names, work = 2)
+
+#coefficients
+coef(test2)
+#confidence interval
+confint(test2, c("wt", "hp"))
+#residual standard error
+sigma(test2)
+#residual standard error with confidence interval
+sigma(test2, confidence = TRUE)
+#prediction
+predict(test2, data.frame(wt = c(2.5, 3), hp = c(150, 170)))
+#prediction with confidence interval
+predict(test2, data.frame(wt = c(2.5, 3), hp = c(150, 170)), confidence = TRUE)
+```
+The functions used to show output is similar to the lst_blblm function above.
+
+
+
